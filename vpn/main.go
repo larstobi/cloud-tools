@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/xanzy/go-cloudstack/cloudstack"
 	"gopkg.in/gcfg.v1"
@@ -122,7 +121,7 @@ func findPublicIPAddressForVPC(client *cloudstack.CloudStackClient, vpcId string
 	} else if addresses.Count == 1 {
 		return addresses.PublicIpAddresses[0].Id, nil
 	} else {
-		return "", errors.New(fmt.Sprintf("Virtual router source NAT ip address for vpcid %s not found", vpcId))
+		return "", fmt.Errorf("Virtual router source NAT ip address for vpcid %s not found", vpcId)
 	}
 
 }
@@ -138,7 +137,7 @@ func findVpcId(client *cloudstack.CloudStackClient, vpcName string) (string, err
 	} else if vpcs.Count == 1 {
 		return vpcs.VPCs[0].Id, nil
 	} else {
-		return "", errors.New(fmt.Sprintf("VPC %s does not exist", vpcName))
+		return "", fmt.Errorf("VPC %s does not exist", vpcName)
 	}
 
 }
