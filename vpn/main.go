@@ -5,6 +5,8 @@ import (
 	"github.com/xanzy/go-cloudstack/cloudstack"
 	"gopkg.in/gcfg.v1"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type config struct {
@@ -57,24 +59,63 @@ func main() {
 
 				fmt.Printf("Remote Access VPN not enabled for VPC, creating new one\n")
 
-				if vpnCreated, err := createRemoteAccessVPN(asyncClient, ipAddressId); err != nil {
-					fmt.Printf("Failed to create new remote access VPN: %s", err.Error())
+				if vpnAddressRange, err := findVPNAddressRange(client, vpcId); err != nil {
+					fmt.Printf("Failed to find cidr range: %s\n", err)
 				} else {
-					vpn = vpnCreated
+					fmt.Printf("VPN address range %s \n", vpnAddressRange)
+
+					if vpnCreated, err := createRemoteAccessVPN(asyncClient, ipAddressId, vpnAddressRange); err != nil {
+						fmt.Printf("Failed to create new remote access VPN: %s", err.Error())
+					} else {
+						vpn = vpnCreated
+					}
+
 				}
 
 			} else {
 				vpn = vpnExisting
 			}
 
-			fmt.Printf("VPN connection details for VPC \"%s\":\n", vpcName)
-			fmt.Printf("IP address: %s\n", vpn.Publicip)
-			fmt.Printf("Preshared secret: %s\n", vpn.Presharedkey)
+			if vpn != nil {
+
+				fmt.Printf("VPN connection details for VPC \"%s\":\n", vpcName)
+				fmt.Printf("IP address: %s\n", vpn.Publicip)
+				fmt.Printf("Preshared secret: %s\n", vpn.Presharedkey)
+
+			}
 
 		}
 
 	}
 
+}
+
+func findVPNAddressRange(client *cloudstack.CloudStackClient, vpcId string) (string, error) {
+
+	service := cloudstack.NewVPCService(client)
+	params := service.NewListVPCsParams()
+	params.SetId(vpcId)
+
+	if vpcs, err := service.ListVPCs(params); err != nil {
+		return "", err
+	} else if vpcs.Count == 1 {
+		cidr := vpcs.VPCs[0].Cidr
+		fmt.Printf("CIDR range for VPC %s is %s\n", vpcId, cidr)
+
+		return calculateVpnCidrRange(cidr), nil
+	} else {
+		return "", fmt.Errorf("VPC with id %s does not exist", vpcId)
+	}
+
+}
+
+func calculateVpnCidrRange(vpcCidr string) string {
+	address := strings.Split(vpcCidr, "/")[0]
+	octets := strings.Split(address, ".")
+	octet, _ := strconv.Atoi(octets[1])
+	start := octets[0] + "." + strconv.Itoa(octet+100) + "." + octets[2] + ".1"
+	end := octets[0] + "." + strconv.Itoa(octet+100) + "." + octets[2] + ".32"
+	return start + "-" + end
 }
 
 func findRemoteAccessVPN(client *cloudstack.CloudStackClient, ipAddressId string) (*cloudstack.RemoteAccessVpn, error) {
@@ -93,12 +134,13 @@ func findRemoteAccessVPN(client *cloudstack.CloudStackClient, ipAddressId string
 
 }
 
-func createRemoteAccessVPN(client *cloudstack.CloudStackClient, ipAddressId string) (*cloudstack.RemoteAccessVpn, error) {
+func createRemoteAccessVPN(client *cloudstack.CloudStackClient, ipAddressId string, addressRange string) (*cloudstack.RemoteAccessVpn, error) {
 
 	service := cloudstack.NewVPNService(client)
 	params := service.NewCreateRemoteAccessVpnParams(ipAddressId)
 	params.SetFordisplay(true)
 	params.SetOpenfirewall(true)
+	params.SetIprange(addressRange)
 
 	if vpn, err := service.CreateRemoteAccessVpn(params); err != nil {
 		return nil, err
