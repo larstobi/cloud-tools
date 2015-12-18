@@ -1,0 +1,14 @@
+---
+
+secret-vars:
+
+  - name: AWS_ACCESS_KEY_ID
+    key: Amazon/route53/ACCOUNT_ID
+
+  - name: AWS_SECRET_ACCESS_KEY
+    key: Amazon/route53/SECRET_KEY
+
+vars:
+
+  - name: AWS_DEFAULT_REGION
+    value: eu-central-1
