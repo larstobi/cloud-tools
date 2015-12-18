@@ -72,7 +72,7 @@ func getEnvironmentVariablesForValues(vars []Variable) []string {
 func parseWrapperConfig() Config {
 
 	dir, _ := os.Getwd()
-	filename, _ := filepath.Abs(fmt.Sprintf("%s%c%s",dir, os.PathSeparator, "wrapper.yml") )
+	filename, _ := filepath.Abs(fmt.Sprintf("%s%c%s", dir, os.PathSeparator, "wrapper.yml"))
 	yamlFile, err := ioutil.ReadFile(filename)
 
 	if err != nil {
