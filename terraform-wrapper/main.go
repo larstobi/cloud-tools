@@ -10,40 +10,30 @@ import (
 	"path/filepath"
 )
 
-/* Example wrapper.yml:
-
----
-
-secret-vars:
-
-  - name: AWS_ACCESS_KEY_ID
-    key: Amazon/route53/ACCOUNT_ID
-
-  - name: AWS_SECRET_ACCESS_KEY
-    key: Amazon/route53/SECRET_KEY
-
-vars:
-
-  - name: AWS_DEFAULT_REGION
-    value: eu-central-1
-
-*/
-
-type SecretVariable struct {
-	Name string
-	Key  string
-}
-
-type Variable struct {
-	Name  string
-	Value string
-}
-
-type Config struct {
-	SecretVariables []SecretVariable `secret-vars`
-	Variables       []Variable       `vars`
-}
-
+// terraform-wrapper will get secrets from your pass password store, 
+// setup an environment containing secrets and execute terraform, 
+// passing command-line arguments to terraform as-is
+//
+// To link the correct password to an environment, a wrapper.yml
+// file has to be placed in the same directory as your *.tf files
+//
+//	Example wrapper.yml:
+//
+//	---
+//
+//	secret-vars:
+//
+//	  - name: AWS_ACCESS_KEY_ID
+//	    key: Amazon/route53/ACCOUNT_ID
+//
+//	  - name: AWS_SECRET_ACCESS_KEY
+//	    key: Amazon/route53/SECRET_KEY
+//
+//	vars:
+//
+//	  - name: AWS_DEFAULT_REGION
+//	    value: eu-central-1
+//
 func main() {
 
 	config := parseWrapperConfig()
@@ -127,4 +117,19 @@ func getPasswordFor(key string) string {
 
 	return password
 
+}
+
+type SecretVariable struct {
+	Name string
+	Key  string
+}
+
+type Variable struct {
+	Name  string
+	Value string
+}
+
+type Config struct {
+	SecretVariables []SecretVariable `secret-vars`
+	Variables       []Variable       `vars`
 }
