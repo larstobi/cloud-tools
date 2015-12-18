@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -71,7 +72,7 @@ func getEnvironmentVariablesForValues(vars []Variable) []string {
 func parseWrapperConfig() Config {
 
 	dir, _ := os.Getwd()
-	filename, _ := filepath.Abs(dir + "/wrapper.yml")
+	filename, _ := filepath.Abs(fmt.Sprintf("%s%c%s",dir, os.PathSeparator, "wrapper.yml") )
 	yamlFile, err := ioutil.ReadFile(filename)
 
 	if err != nil {
@@ -90,9 +91,10 @@ func parseWrapperConfig() Config {
 }
 
 func executeTerraform(args []string, environment []string) {
-	cmd := exec.Command("/Users/landro/terraform_0.6.6_darwin_amd64/terraform", args...)
 
-	cmd.Env = environment
+	cmd := exec.Command("terraform", args...)
+
+	cmd.Env = append(environment, "PATH="+os.Getenv("PATH"))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Start()
@@ -101,7 +103,8 @@ func executeTerraform(args []string, environment []string) {
 
 func getPasswordFor(key string) string {
 
-	cmd := exec.Command("/usr/local/bin/pass", key)
+	cmd := exec.Command("pass", key)
+	//cmd.Env = ()
 	// Ask for gpg password if necessary
 	cmd.Stdin = os.Stdin
 
