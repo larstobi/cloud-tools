@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -39,22 +38,37 @@ type Variable struct {
 	Value string
 }
 
-type Variables struct {
+type Config struct {
 	SecretVariables []SecretVariable `secret-vars`
 	Variables       []Variable       `vars`
 }
 
 func main() {
 
-	parseWrapperConfig()
-	argsWithoutProg := os.Args[1:]
-	accountid := getPasswordFor("CloudStack/apikeys/ACCOUNT_ID")
-	fmt.Println(accountid)
-	executeTerraform(argsWithoutProg)
+	config := parseWrapperConfig()
+	secEnv := getEnvironmentVariablesForSecrets(config.SecretVariables[:])
+	env := getEnvironmentVariablesForValues(config.Variables[:])
+	executeTerraform(os.Args[1:], append(secEnv, env...))
 
 }
 
-func parseWrapperConfig() {
+func getEnvironmentVariablesForSecrets(secretVars []SecretVariable) []string {
+	var environment []string
+	for i := 0; i < len(secretVars); i++ {
+		environment = append(environment, secretVars[i].Name+"="+getPasswordFor(secretVars[i].Key))
+	}
+	return environment
+}
+
+func getEnvironmentVariablesForValues(vars []Variable) []string {
+	var environment []string
+	for i := 0; i < len(vars); i++ {
+		environment = append(environment, vars[i].Name+"="+vars[i].Value)
+	}
+	return environment
+}
+
+func parseWrapperConfig() Config {
 
 	dir, _ := os.Getwd()
 	filename, _ := filepath.Abs(dir + "/wrapper.yml")
@@ -64,30 +78,19 @@ func parseWrapperConfig() {
 		panic(err)
 	}
 
-	var config Variables
+	var config Config
 
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
 		panic(err)
 	}
-	// TODO remove
-	fmt.Println("Secret var 0 : " + config.SecretVariables[0].Name)
-	fmt.Println("Secret var 0 : " + config.SecretVariables[0].Key)
-	fmt.Println("Var 0 key : " + config.Variables[0].Name)
-	fmt.Println("Var 0 key : " + config.Variables[0].Value)
+
+	return config
 
 }
 
-
-
-func executeTerraform(args []string) {
+func executeTerraform(args []string, environment []string) {
 	cmd := exec.Command("/Users/landro/terraform_0.6.6_darwin_amd64/terraform", args...)
-
-	var environment []string
-	environment = append(environment,
-		"AWS_ACCESS_KEY_ID=abc",
-		"AWS_SECRET_ACCESS_KEY=eef",
-		"AWS_DEFAULT_REGION=eu-abd")
 
 	cmd.Env = environment
 	cmd.Stdout = os.Stdout
@@ -113,17 +116,12 @@ func getPasswordFor(key string) string {
 	defer cmd.Wait()
 
 	buff := bufio.NewScanner(stdout)
-	var allText string
+	var password string
 
 	for buff.Scan() {
-		allText += buff.Text()
+		password += buff.Text()
 	}
 
-	// TODO remove
-	fmt.Printf("abc")
-	fmt.Printf(allText)
-	fmt.Printf("def")
-
-	return allText
+	return password
 
 }
