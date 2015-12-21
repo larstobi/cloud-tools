@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"github.com/digipost/cloud-tools/config"
 	"os"
 	"os/exec"
-	"path/filepath"
 )
 
 // terraform-wrapper will get secrets from your pass password store,
@@ -36,48 +32,27 @@ import (
 //
 func main() {
 
-	config := parseWrapperConfig()
+	config := config.ParseDefaultCloudConfig()
 	secEnv := getEnvironmentVariablesForSecrets(config.SecretVariables[:])
 	env := getEnvironmentVariablesForValues(config.Variables[:])
 	executeTerraform(os.Args[1:], append(secEnv, env...))
 
 }
 
-func getEnvironmentVariablesForSecrets(secretVars []SecretVariable) []string {
+func getEnvironmentVariablesForSecrets(secretVars []config.SecretVariable) []string {
 	var environment []string
 	for i := 0; i < len(secretVars); i++ {
-		environment = append(environment, secretVars[i].Name+"="+getPasswordFor(secretVars[i].Key))
+		environment = append(environment, secretVars[i].Name+"="+config.GetPasswordFor(secretVars[i].Key))
 	}
 	return environment
 }
 
-func getEnvironmentVariablesForValues(vars []Variable) []string {
+func getEnvironmentVariablesForValues(vars []config.Variable) []string {
 	var environment []string
 	for i := 0; i < len(vars); i++ {
 		environment = append(environment, vars[i].Name+"="+vars[i].Value)
 	}
 	return environment
-}
-
-func parseWrapperConfig() Config {
-
-	dir, _ := os.Getwd()
-	filename, _ := filepath.Abs(fmt.Sprintf("%s%c%s", dir, os.PathSeparator, "wrapper.yml"))
-	yamlFile, err := ioutil.ReadFile(filename)
-
-	if err != nil {
-		panic(err)
-	}
-
-	var config Config
-
-	err = yaml.Unmarshal(yamlFile, &config)
-	if err != nil {
-		panic(err)
-	}
-
-	return config
-
 }
 
 func executeTerraform(args []string, environment []string) {
@@ -89,47 +64,4 @@ func executeTerraform(args []string, environment []string) {
 	cmd.Stderr = os.Stderr
 	cmd.Start()
 	defer cmd.Wait()
-}
-
-func getPasswordFor(key string) string {
-
-	cmd := exec.Command("pass", key)
-	//cmd.Env = ()
-	// Ask for gpg password if necessary
-	cmd.Stdin = os.Stdin
-
-	// capture the output and error pipes
-	stdout, _ := cmd.StdoutPipe()
-	//stderr, _ := cmd.StderrPipe()
-
-	cmd.Start()
-
-	// Don't let main() exit before our command has finished running
-	// doesn't block
-	defer cmd.Wait()
-
-	buff := bufio.NewScanner(stdout)
-	var password string
-
-	for buff.Scan() {
-		password += buff.Text()
-	}
-
-	return password
-
-}
-
-type SecretVariable struct {
-	Name string
-	Key  string
-}
-
-type Variable struct {
-	Name  string
-	Value string
-}
-
-type Config struct {
-	SecretVariables []SecretVariable `secret-vars`
-	Variables       []Variable       `vars`
 }
