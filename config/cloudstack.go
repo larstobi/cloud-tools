@@ -1,9 +1,5 @@
 package config
 
-import (
-//"github.com/digipost/cloud-tools/config"
-)
-
 // Returns CloudStack relevant client config
 // apiurl, apikey and secret retrieved from the pass
 // password store
@@ -14,22 +10,22 @@ func CloudstackClientConfig() (string, string, string) {
 	var secret string
 
 	cloudConfig := ParseDefaultCloudConfig()
-	secVars := cloudConfig.SecretVariables
-	for i := 0; i < len(secVars); i++ {
 
-		if secVars[i].Name == "CLOUDSTACK_API_KEY" {
-			apikey = GetPasswordFor(secVars[i].Key)
+	for _, secVar := range cloudConfig.SecretVariables {
+
+		if secVar.Name == "CLOUDSTACK_API_KEY" {
+			apikey = GetPasswordFor(secVar.Key)
 		}
 
-		if secVars[i].Name == "CLOUDSTACK_SECRET_KEY" {
-			secret = GetPasswordFor(secVars[i].Key)
+		if secVar.Name == "CLOUDSTACK_SECRET_KEY" {
+			secret = GetPasswordFor(secVar.Key)
 		}
 
 	}
-	vars := cloudConfig.Variables
-	for i := 0; i < len(vars); i++ {
-		if vars[i].Name == "CLOUDSTACK_API_URL" {
-			apiurl = vars[i].Value
+
+	for _, variable := range cloudConfig.Variables {
+		if variable.Name == "CLOUDSTACK_API_URL" {
+			apiurl = variable.Value
 		}
 	}
 

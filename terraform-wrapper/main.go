@@ -41,16 +41,16 @@ func main() {
 
 func getEnvironmentVariablesForSecrets(secretVars []config.SecretVariable) []string {
 	var environment []string
-	for i := 0; i < len(secretVars); i++ {
-		environment = append(environment, secretVars[i].Name+"="+config.GetPasswordFor(secretVars[i].Key))
+	for _, secretVar := range secretVars {
+		environment = append(environment, secretVar.Name+"="+config.GetPasswordFor(secretVar.Key))
 	}
 	return environment
 }
 
 func getEnvironmentVariablesForValues(vars []config.Variable) []string {
 	var environment []string
-	for i := 0; i < len(vars); i++ {
-		environment = append(environment, vars[i].Name+"="+vars[i].Value)
+	for _, variable := range vars {
+		environment = append(environment, variable.Name+"="+variable.Value)
 	}
 	return environment
 }
