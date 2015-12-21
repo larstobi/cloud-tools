@@ -51,7 +51,7 @@ func main() {
 		vars := cloudConfig.Variables
 		for i := 0; i < len(vars); i++ {
 			if vars[i].Name == "CLOUDSTACK_API_URL" {
-				apikey = config.GetPasswordFor(vars[i].Value)
+				apiurl = vars[i].Value
 			}
 		}
 
