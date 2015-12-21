@@ -20,44 +20,17 @@ import (
 //
 // sudo route add 10.x.0.0/16 10.(x+100).0.1
 //
-// CLOUDSTACK_API_URL
-// CLOUDSTACK_API_KEY
-// CLOUDSTACK_SECRET_KEY
-//
 func main() {
 
-	var apiurl string
-	var apikey string
-	var secret string
-
-	if len(os.Args)!= 2 {
+	if len(os.Args) != 2 {
 		fmt.Printf("Enable remote VPN access on VPC\n")
 		fmt.Printf("Usage: vpn <vpcname>\n")
 		os.Exit(1)
-	} else {
-		cloudConfig := config.ParseDefaultCloudConfig()
-		secVars := cloudConfig.SecretVariables
-		for i := 0; i < len(secVars); i++ {
-
-			if secVars[i].Name == "CLOUDSTACK_API_KEY" {
-				apikey = config.GetPasswordFor(secVars[i].Key)
-			}
-
-			if secVars[i].Name == "CLOUDSTACK_SECRET_KEY" {
-				secret = config.GetPasswordFor(secVars[i].Key)
-			}
-
-		}
-		vars := cloudConfig.Variables
-		for i := 0; i < len(vars); i++ {
-			if vars[i].Name == "CLOUDSTACK_API_URL" {
-				apiurl = vars[i].Value
-			}
-		}
-
 	}
 
 	vpcName := os.Args[1]
+
+	apiurl, apikey, secret := config.CloudstackClientConfig()
 
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 	asyncClient := cloudstack.NewAsyncClient(apiurl, apikey, secret, true)
@@ -122,7 +95,6 @@ func findVPNAddressRange(client *cloudstack.CloudStackClient, vpcId string) (str
 	} else if vpcs.Count == 1 {
 		cidr := vpcs.VPCs[0].Cidr
 		fmt.Printf("CIDR range for VPC %s is %s\n", vpcId, cidr)
-
 		return calculateVpnCidrRange(cidr), nil
 	} else {
 		return "", fmt.Errorf("VPC with id %s does not exist", vpcId)
