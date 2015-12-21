@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 )
 
-// terraform-wrapper will get secrets from your pass password store, 
-// setup an environment containing secrets and execute terraform, 
+// terraform-wrapper will get secrets from your pass password store,
+// setup an environment containing secrets and execute terraform,
 // passing command-line arguments to terraform as-is
 //
 // To link the correct password to an environment, a wrapper.yml

@@ -9,14 +9,17 @@ import (
 	"strings"
 )
 
-type config struct {
-	Cloudstack struct {
-		Endpoint string
-		Key      string
-		Secret   string
-	}
-}
-
+// Utility to enable remote access VPN on an 
+// Apache Cloudstack VPC 
+// 
+// If 10.x.0.0/16 is the CIDR of your VPC,
+// the vpn concentrator will distribute IPs in  
+// Will give you an IP in the 10.(x+100).0.0 CIDR
+// 
+// To enable routing to this network:
+//
+// sudo route add 10.x.0.0/16 10.(x+100).0.1
+// 
 func main() {
 
 	argsWithoutProg := os.Args[1:]
@@ -182,4 +185,13 @@ func findVpcId(client *cloudstack.CloudStackClient, vpcName string) (string, err
 		return "", fmt.Errorf("VPC %s does not exist", vpcName)
 	}
 
+}
+
+
+type config struct {
+	Cloudstack struct {
+		Endpoint string
+		Key      string
+		Secret   string
+	}
 }
