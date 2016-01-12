@@ -12,7 +12,7 @@ import (
 // Use optional argument to filter using keyword
 func main() {
 
-	var keyword string  = ""
+	var keyword string = ""
 
 	if len(os.Args) == 2 {
 		keyword = os.Args[1]
