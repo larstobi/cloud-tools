@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/digipost/cloud-tools/config"
-  "github.com/digipost/cloud-tools/wrapper"
+	"github.com/digipost/cloud-tools/wrapper"
 	"os"
 )
 

@@ -106,8 +106,8 @@ func calculateVpnCidrRange(vpcCidr string) string {
 	address := strings.Split(vpcCidr, "/")[0]
 	octets := strings.Split(address, ".")
 	octet, _ := strconv.Atoi(octets[1])
-	start := octets[0] + "." + strconv.Itoa(octet+100) + "." + octets[2] + ".1"
-	end := octets[0] + "." + strconv.Itoa(octet+100) + "." + octets[2] + ".32"
+	start := octets[0] + "." + strconv.Itoa(octet + 100) + "." + octets[2] + ".1"
+	end := octets[0] + "." + strconv.Itoa(octet + 100) + "." + octets[2] + ".32"
 	return start + "-" + end
 }
 
