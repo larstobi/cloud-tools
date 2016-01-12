@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/digipost/cloud-tools/config"
+  "github.com/digipost/cloud-tools/wrapper"
 	"os"
-	"os/exec"
 )
 
 // terraform-wrapper will get secrets from your pass password store,
@@ -33,35 +33,9 @@ import (
 func main() {
 
 	config := config.ParseDefaultCloudConfig()
-	secEnv := getEnvironmentVariablesForSecrets(config.SecretVariables[:])
-	env := getEnvironmentVariablesForValues(config.Variables[:])
-	executeTerraform(os.Args[1:], append(secEnv, env...))
+	secEnv := wrapper.GetEnvironmentVariablesForSecrets(config.SecretVariables[:])
+	env := wrapper.GetEnvironmentVariablesForValues(config.Variables[:])
+	wrapper.ExecuteTerraform("terraform", os.Args[1:], append(secEnv, env...))
 
 }
 
-func getEnvironmentVariablesForSecrets(secretVars []config.SecretVariable) []string {
-	var environment []string
-	for _, secretVar := range secretVars {
-		environment = append(environment, secretVar.Name+"="+config.GetPasswordFor(secretVar.Key))
-	}
-	return environment
-}
-
-func getEnvironmentVariablesForValues(vars []config.Variable) []string {
-	var environment []string
-	for _, variable := range vars {
-		environment = append(environment, variable.Name+"="+variable.Value)
-	}
-	return environment
-}
-
-func executeTerraform(args []string, environment []string) {
-
-	cmd := exec.Command("terraform", args...)
-
-	cmd.Env = append(environment, "PATH="+os.Getenv("PATH"))
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Start()
-	defer cmd.Wait()
-}
