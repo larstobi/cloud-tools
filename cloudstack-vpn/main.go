@@ -24,7 +24,7 @@ func main() {
 
 	if len(os.Args) != 2 {
 		fmt.Printf("Enable remote VPN access on VPC\n")
-		fmt.Printf("Usage: vpn <vpcname>\n")
+		fmt.Printf("Usage: cloudstack-vpn <vpcname>\n")
 		os.Exit(1)
 	}
 
