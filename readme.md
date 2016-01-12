@@ -22,10 +22,11 @@ Will enable vpn for given vpc-name
 
     terraform-wrapper [args.....]
     
-Will call _terraform_ passing environment variables found in cloud-config.yml
+Will call _terraform_ passing arguments to _terraform-wrapper_ as-is in addition to 
+environment variables found in _cloud-config.yml_
  
  
-## Configuration
+## Configuration:
 
 Utilties will look for a file called _cloud-config.yml_ in cwd containing references to passwords stored in 
 a pass password store and inline clear text variables
