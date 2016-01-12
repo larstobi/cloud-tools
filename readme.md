@@ -29,3 +29,20 @@ Will call _terraform_ passing environment variables found in cloud-config.yml
 
 Utilties will look for a file called _cloud-config.yml_ in cwd containing references to passwords stored in 
 a pass password store and inline clear text variables
+
+### Example _cloud-config.yml_:
+
+    ---
+    
+    secret-vars:
+    
+      - name: AWS_ACCESS_KEY_ID
+        key: Amazon/route53/ACCOUNT_ID
+    
+      - name: AWS_SECRET_ACCESS_KEY
+        key: Amazon/route53/SECRET_KEY
+    
+    vars:
+    
+      - name: AWS_DEFAULT_REGION
+        value: eu-central-1
