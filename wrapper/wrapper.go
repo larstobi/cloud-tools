@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-//  Appends env vars for secrets to environment
+// GetEnvironmentVariablesForSecrets appends env vars for secrets to environment
 func GetEnvironmentVariablesForSecrets(secretVars []config.SecretVariable) []string {
 	var environment []string
 	for _, secretVar := range secretVars {
@@ -15,7 +15,7 @@ func GetEnvironmentVariablesForSecrets(secretVars []config.SecretVariable) []str
 	return environment
 }
 
-// Appends env vars for values to environment
+// GetEnvironmentVariablesForValues appends env vars for values to environment
 func GetEnvironmentVariablesForValues(vars []config.Variable) []string {
 	var environment []string
 	for _, variable := range vars {
@@ -24,7 +24,7 @@ func GetEnvironmentVariablesForValues(vars []config.Variable) []string {
 	return environment
 }
 
-// Builds the command line string to be executed
+// ExecuteTerraform builds the command line string to be executed
 func ExecuteTerraform(command string, args []string, environment []string) {
 
 	cmd := exec.Command(command, args...)
