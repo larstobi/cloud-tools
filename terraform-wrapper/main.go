@@ -14,7 +14,7 @@ func main() {
 	config := config.ParseDefaultCloudConfig()
 	secEnv := wrapper.GetEnvironmentVariablesForSecrets(config.SecretVariables[:])
 	env := wrapper.GetEnvironmentVariablesForValues(config.Variables[:])
-	wrapper.ExecuteTerraform("terraform", os.Args[1:], append(secEnv, env...))
+	wrapper.ExecuteCommand("terraform", os.Args[1:], append(secEnv, env...))
 
 }
 

@@ -24,8 +24,8 @@ func GetEnvironmentVariablesForValues(vars []config.Variable) []string {
 	return environment
 }
 
-// ExecuteTerraform builds the command line string to be executed
-func ExecuteTerraform(command string, args []string, environment []string) {
+// ExecuteCommand builds the command line string to be executed
+func ExecuteCommand(command string, args []string, environment []string) {
 
 	cmd := exec.Command(command, args...)
 
