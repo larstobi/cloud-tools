@@ -37,6 +37,9 @@ func main() {
 
 	if vpcId, err := findVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
+		fmt.Printf("Hint 1: multiple VPCs using same name?\n")
+		fmt.Printf("Hint 2: No VPCs using this name?\n")
+		fmt.Printf("Hint 3: Using wrong user?\n")
 	} else {
 
 		fmt.Printf("VPC id %s found for vpc name \"%s\"\n", vpcId, vpcName)
