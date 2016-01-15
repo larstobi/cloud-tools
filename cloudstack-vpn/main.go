@@ -51,7 +51,7 @@ func main() {
 			var vpn *cloudstack.RemoteAccessVpn
 
 			if vpnExisting, err := findRemoteAccessVPN(client, ipAddressId); err != nil {
-				fmt.Printf("Failed to find remote access VPN: %s", err.Error)
+				fmt.Printf("Failed to find remote access VPN: %s", err.Error())
 			} else if vpnExisting == nil {
 
 				fmt.Printf("Remote Access VPN not enabled for VPC, creating new one\n")
@@ -164,6 +164,7 @@ func findPublicIPAddressForVPC(client *cloudstack.CloudStackClient, vpcId string
 
 }
 
+// TODO extract this
 func findVpcId(client *cloudstack.CloudStackClient, vpcName string) (string, error) {
 
 	service := cloudstack.NewVPCService(client)
