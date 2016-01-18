@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"github.com/digipost/cloud-tools/cloudstackutils"
 )
 
 // Utility to enable remote access VPN on an
@@ -35,11 +36,9 @@ func main() {
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 	asyncClient := cloudstack.NewAsyncClient(apiurl, apikey, secret, true)
 
-	if vpcId, err := findVpcId(client, vpcName); err != nil {
+	if vpcId, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
-		fmt.Printf("Hint 1: multiple VPCs using same name?\n")
-		fmt.Printf("Hint 2: No VPCs using this name?\n")
-		fmt.Printf("Hint 3: Using wrong user?\n")
+		fmt.Printf("Hint: Using wrong user?\n")
 	} else {
 
 		fmt.Printf("VPC id %s found for vpc name \"%s\"\n", vpcId, vpcName)
@@ -160,23 +159,6 @@ func findPublicIPAddressForVPC(client *cloudstack.CloudStackClient, vpcId string
 		return addresses.PublicIpAddresses[0].Id, nil
 	} else {
 		return "", fmt.Errorf("Virtual router source NAT ip address for vpcid %s not found", vpcId)
-	}
-
-}
-
-// TODO extract this
-func findVpcId(client *cloudstack.CloudStackClient, vpcName string) (string, error) {
-
-	service := cloudstack.NewVPCService(client)
-	params := service.NewListVPCsParams()
-	params.SetName(vpcName)
-
-	if vpcs, err := service.ListVPCs(params); err != nil {
-		return "", err
-	} else if vpcs.Count == 1 {
-		return vpcs.VPCs[0].Id, nil
-	} else {
-		return "", fmt.Errorf("VPC %s does not exist", vpcName)
 	}
 
 }
