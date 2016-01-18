@@ -12,12 +12,11 @@ import (
 // setup an environment containing secrets and execute terraform,
 // passing command-line arguments to terraform as-is
 func main() {
-	fmt.Println("Starting terraform-wrapper at:", time.Now())
+	fmt.Println("Starting terraform operation at:", time.Now())
 	config := config.ParseDefaultCloudConfig()
 	secEnv := wrapper.GetEnvironmentVariablesForSecrets(config.SecretVariables[:])
 	env := wrapper.GetEnvironmentVariablesForValues(config.Variables[:])
 	wrapper.ExecuteTerraform("terraform", os.Args[1:], append(secEnv, env...))
-	fmt.Println("Ending terraform-wrapper at:", time.Now())
-
+	fmt.Println("Ending terraform operation at:", time.Now())
 }
 

@@ -9,8 +9,7 @@ import (
 
 
 func main() {
-
-
+	
 	if len(os.Args) != 2 {
 		fmt.Printf("Restart VPC\n")
 		fmt.Printf("Usage: cloudstack-vpc-restart <vpcname>\n")
@@ -23,7 +22,6 @@ func main() {
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 
 	vpcService := cloudstack.NewVPCService(client)
-
 
 	if vpcId, err := findVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
