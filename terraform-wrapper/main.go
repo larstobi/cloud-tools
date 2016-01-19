@@ -16,7 +16,7 @@ func main() {
 	config := config.ParseDefaultCloudConfig()
 	secEnv := wrapper.GetEnvironmentVariablesForSecrets(config.SecretVariables[:])
 	env := wrapper.GetEnvironmentVariablesForValues(config.Variables[:])
-	wrapper.ExecuteTerraform("terraform", os.Args[1:], append(secEnv, env...))
+	wrapper.ExecuteCommand("terraform", os.Args[1:], append(secEnv, env...))
 	fmt.Println("Ending terraform operation at:", time.Now())
 }
 
