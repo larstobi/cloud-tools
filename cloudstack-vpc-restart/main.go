@@ -29,7 +29,7 @@ func main() {
 		if _, err := vpcService.RestartVPC(vpcService.NewRestartVPCParams(vpcId)); err != nil {
 			fmt.Printf("Failed to restart VPC \"%s\": %s\n", vpcName, err.Error())
 		} else {
-			fmt.Printf("Restarting VPC \"%s\"... ")
+			fmt.Printf("Restarting VPC \"%s\"... ", vpcName)
 		}
 
 	}
