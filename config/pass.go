@@ -5,8 +5,10 @@ import (
 	"os"
 	"os/exec"
 	"fmt"
+	"io"
 	"strconv"
 	"regexp"
+	"bytes"
 )
 
 // GetPasswordFor will lookup key in pass - the linux password store
@@ -40,12 +42,7 @@ func GetPasswordFor(key string) string {
 // GeneratePasswordFor will generate password of given length in given password storage dir
 func GeneratePasswordFor(passwordStorageDirectory string, passName string, passLength int) (string) {
 
-	var environment []string
-	environment = append(environment,
-		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
-		fmt.Sprintf("HOME=%s", os.Getenv("HOME")),
-		fmt.Sprintf("PASSWORD_STORE_DIR=%s", passwordStorageDirectory),
-		fmt.Sprintf("PASSWORD_STORE_GIT=%s", passwordStorageDirectory))
+	environment := getIsolatedPassEnvironment(passwordStorageDirectory)
 
 	cmd := exec.Command("pass", "generate", "-f", "-n", passName, strconv.Itoa(passLength))
 
@@ -78,4 +75,28 @@ func stripCtlAndExtFromBytes(str string) string {
 		}
 	}
 	return string(b[:bl])
+}
+
+// InsertPasswordFor will insert password pass store in given storage dir
+func InsertPasswordFor(passwordStorageDirectory string, passName string, password string) {
+
+	environment := getIsolatedPassEnvironment(passwordStorageDirectory)
+
+	cmd := exec.Command("pass", "insert", "-e", passName)
+	cmd.Env = environment
+	stdin , _ := cmd.StdinPipe()
+	cmd.Start()
+	defer cmd.Wait()
+	io.Copy(stdin, bytes.NewBufferString(password))
+	defer stdin.Close()
+}
+
+func getIsolatedPassEnvironment(passwordStorageDirectory string) ([]string) {
+	var environment []string
+	environment = append(environment,
+		fmt.Sprintf("PATH=%s", os.Getenv("PATH")),
+		fmt.Sprintf("HOME=%s", os.Getenv("HOME")),
+		fmt.Sprintf("PASSWORD_STORE_DIR=%s", passwordStorageDirectory),
+		fmt.Sprintf("PASSWORD_STORE_GIT=%s", passwordStorageDirectory))
+	return environment
 }

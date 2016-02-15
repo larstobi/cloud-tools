@@ -23,9 +23,9 @@ import (
 //
 func main() {
 
-	if len(os.Args) != 2 {
+	if len(os.Args) < 2 {
 		fmt.Printf("Enable remote VPN access on VPC\n")
-		fmt.Printf("Usage: cloudstack-vpn <vpcname>\n")
+		fmt.Printf("Usage: cloudstack-vpn <vpcname> [<PASSWORD_STORE_DIR>]\n")
 		os.Exit(1)
 	}
 
@@ -36,9 +36,9 @@ func main() {
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 	asyncClient := cloudstack.NewAsyncClient(apiurl, apikey, secret, true)
 
-	if vpcId, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
+	if vpcId, vpcName, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
-		fmt.Printf("Hint: Using wrong user?\n")
+		fmt.Println("Hint: Using wrong user?")
 	} else {
 
 		fmt.Printf("VPC id %s found for vpc name \"%s\"\n", vpcId, vpcName)
@@ -78,6 +78,10 @@ func main() {
 				fmt.Printf("IP address: %s\n", vpn.Publicip)
 				fmt.Printf("Preshared secret: %s\n", vpn.Presharedkey)
 
+				if len(os.Args) == 3 {
+					fmt.Printf("Saving preshared secret to password store in : %s\n", os.Args[2])
+					config.InsertPasswordFor(os.Args[2], vpcName, vpn.Presharedkey)
+				}
 			}
 
 		}

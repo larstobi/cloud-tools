@@ -23,7 +23,7 @@ func main() {
 
 	vpcService := cloudstack.NewVPCService(client)
 
-	if vpcId, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
+	if vpcId, vpcName, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
 	} else {
 		if _, err := vpcService.RestartVPC(vpcService.NewRestartVPCParams(vpcId)); err != nil {

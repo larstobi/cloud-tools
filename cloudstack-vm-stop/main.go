@@ -22,7 +22,7 @@ func main() {
 	apiurl, apikey, secret := config.CloudstackClientConfig()
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 
-	if vpcId, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
+	if vpcId, vpcName, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
 		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
 	} else {
 
