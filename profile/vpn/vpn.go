@@ -1,14 +1,16 @@
-package main
+package vpn
+
 import (
 	"text/template"
-	"os"
 	b64 "encoding/base64"
 	"os/exec"
 	"fmt"
 	"strings"
+	"time"
+	"io"
 )
 
-type VpnSettings struct {
+type Settings struct {
 	ConsentText         string
 	SharedSecret        string
 	Username            string
@@ -19,34 +21,13 @@ type VpnSettings struct {
 	PayloadDisplayName  string
 	PayloadIdentifier   string
 	PayloadOrganization string
-	PayloadUUIDInternal string
-	PayloadUUID         string
 }
 
-// Will generate a VPN profile that can be installed/removed using
-//
-// profiles -I -F my.profile
-// profiles -R -F my.profile
-//
-// Original XML was generated using "Apple Configurator 2" that can be
-// installed from the app store
-func main() {
+func (u Settings) PayloadUUID() string {
+	return uuidgen();
+}
 
-	vpnSettings := VpnSettings{
-		ConsentText: "Installing VPN connection to Signering Ops Test...",
-		SharedSecret: "SharedSecret",
-		Username: "myusername",
-		Password: "mypassword",
-		Hostname: "opstest.signering.posten.no",
-		UserDefinedName:"Signering Ops Test (P)",
-		PayloadDescription: "This will install a VPN connection to Signering Ops Test",
-		PayloadDisplayName: "Profile for Signering Ops Test VPN",
-		PayloadIdentifier: "no.posten.signering.opstest.vpn",
-		PayloadOrganization: "Digipost",
-		PayloadUUIDInternal: uuidgen(),
-		PayloadUUID: uuidgen(),
-
-	}
+func GenerateVpnProfile(writer io.Writer, vpnSettings *Settings) {
 
 	funcMap := template.FuncMap{
 		"base64": base64,
@@ -55,12 +36,16 @@ func main() {
 	t := template.New("VPN Profile")
 	t.Funcs(funcMap)
 	t.Parse(vpnProfile)
-	t.Execute(os.Stdout, vpnSettings)
+	t.Execute(writer, vpnSettings)
 
 }
 
 func base64(data string) (string) {
 	return b64.StdEncoding.EncodeToString([]byte(data))
+}
+
+func version() (int64) {
+	return time.Now().Unix()
 }
 
 func uuidgen() (string) {
@@ -70,6 +55,8 @@ func uuidgen() (string) {
 	return fmt.Sprintf("%s", uuid)
 }
 
+// Original XML was generated using "Apple Configurator 2" that can be
+// installed from the app store
 const vpnProfile =
 `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -117,7 +104,7 @@ const vpnProfile =
 			<key>PayloadType</key>
 			<string>com.apple.vpn.managed</string>
 			<key>PayloadUUID</key>
-			<string>{{ .PayloadUUIDInternal }}</string>
+			<string>{{ .PayloadUUID }}</string>
 			<key>PayloadVersion</key>
 			<real>1</real>
 			<key>Proxies</key>

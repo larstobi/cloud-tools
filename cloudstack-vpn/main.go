@@ -29,15 +29,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	vpcName := os.Args[1]
+	vpcNameProvided := os.Args[1]
 
 	apiurl, apikey, secret := config.CloudstackClientConfig()
 
 	client := cloudstack.NewClient(apiurl, apikey, secret, true)
 	asyncClient := cloudstack.NewAsyncClient(apiurl, apikey, secret, true)
 
-	if vpcId, vpcName, err := cloudstackutils.FindVpcId(client, vpcName); err != nil {
-		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcName, err.Error())
+	if vpcId, vpcName, err := cloudstackutils.FindVpcId(client, vpcNameProvided); err != nil {
+		fmt.Printf("Failed to find id for VPC \"%s\": %s\n", vpcNameProvided, err.Error())
 		fmt.Println("Hint: Using wrong user?")
 	} else {
 
