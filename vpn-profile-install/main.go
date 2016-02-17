@@ -80,7 +80,7 @@ func getVpnHostnameForVpcName(vpcName string) (string) {
 		domain = "signering.posten.no"
 	case "mf" <= systemShort:
 		domain = "meldingsformidler.digipost.no"
-	case "dp" <= systemShort:
+	case "digi" <= systemShort:
 		domain = "digipost.no"
 	}
 
