@@ -23,12 +23,11 @@ func main() {
 	toZone := os.Args[3]
 
 	apiurl, apikey, secret := config.CloudstackClientConfig()
-	client := cloudstack.NewClient(apiurl, apikey, secret, true)
-
+	asyncclient := cloudstack.NewAsyncClient(apiurl, apikey, secret, true)
 
 	// Lookup zone ids
 
-	service := cloudstack.NewZoneService(client)
+	service := cloudstack.NewZoneService(asyncclient)
 
 	var fromId = ""
 	if from, _, err := service.GetZoneByName(fromZone); err != nil {
@@ -46,7 +45,7 @@ func main() {
 
 	// Lookup templates
 
-	templateService := cloudstack.NewTemplateService(client)
+	templateService := cloudstack.NewTemplateService(asyncclient)
 
 	// Can only own templates
 	listTemplatesParams := templateService.NewListTemplatesParams("self")
