@@ -1,4 +1,5 @@
 package main
+
 import (
 	"github.com/digipost/cloud-tools/profile/vpn"
 	"os"
@@ -38,8 +39,7 @@ func main() {
 	passwordKey := fmt.Sprintf("users/%s/vpn", username)
 
 	password := config.GetPasswordFromPasswordStoreFor(passwordKey, passwordStoreDir)
-	sharedSecret := config.GetPasswordFromPasswordStoreFor(vpcName, passwordStoreDir)
-
+	sharedSecret := config.GetPasswordFromPasswordStoreFor(fmt.Sprintf("shared/%s", vpcName), passwordStoreDir)
 
 	vpnSettings := &vpn.Settings{
 		ConsentText: "Installing VPN connection...",
@@ -54,7 +54,6 @@ func main() {
 		PayloadOrganization: vpcName,
 	}
 
-
 	cmd := exec.Command("profiles", "-I", "-F", "-")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
@@ -68,9 +67,7 @@ func main() {
 
 func getVpnHostnameForVpcName(vpcName string) (string) {
 
-	parts := strings.Split(vpcName, "-")
-	zone := parts[1]
-	systemEnv := strings.Split(parts[0], "_")
+	systemEnv := strings.Split(vpcName, "_")
 	systemShort := systemEnv[0]
 	env := systemEnv[1]
 
@@ -84,7 +81,7 @@ func getVpnHostnameForVpcName(vpcName string) (string) {
 		domain = "digipost.no"
 	}
 
-	return fmt.Sprintf("vpn.%s.%s.%s", zone, env, domain)
+	return fmt.Sprintf("vpn.%s.%s", env, domain)
 
 }
 

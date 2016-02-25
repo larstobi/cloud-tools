@@ -80,7 +80,7 @@ func main() {
 
 				if len(os.Args) == 3 {
 					fmt.Printf("Saving preshared secret to password store in : %s\n", os.Args[2])
-					config.InsertPasswordFor(os.Args[2], vpcName, vpn.Presharedkey)
+					config.InsertPasswordFor(os.Args[2], fmt.Sprintf("shared/%s", vpcName), vpn.Presharedkey)
 				}
 			}
 
