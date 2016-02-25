@@ -16,7 +16,7 @@ func FindVpcId(client *cloudstack.CloudStackClient, vpcName string) (string, str
 	} else if vpcs.Count == 1 {
 		return vpcs.VPCs[0].Id, vpcs.VPCs[0].Name, nil
 	} else {
-		return "", "", fmt.Errorf("VPC \"%s\" does not exist, or too many VPCs matching name/filter", vpcName)
+		return "", "", fmt.Errorf("VPC \"%s\" does not exist, or too many VPCs matching name/filter. Found %d matches.",  vpcName, vpcs.Count)
 	}
 
 }
