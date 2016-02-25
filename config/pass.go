@@ -86,6 +86,23 @@ func InsertPasswordFor(passwordStorageDirectory string, passName string, passwor
 	io.Copy(stdin, bytes.NewBufferString(password))
 	defer stdin.Close()
 }
+// InitialisePasswordStore will initialise password store with given gpgKeyIds
+func InitialisePasswordStore(passwordStorageDirectory string, passName string, gpgKeyIds ...string) {
+
+	args := make([]string, 0)
+	args = append(args, "init")
+	args = append(args, "-p")
+	args = append(args, passName)
+	args = append(args, gpgKeyIds...)
+
+	cmd := exec.Command("pass", args...)
+	cmd.Env = isolatedPassEnvironment(passwordStorageDirectory)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Start()
+	defer cmd.Wait()
+}
+
 
 func isolatedPassEnvironment(passwordStorageDirectory string) ([]string) {
 	var environment []string
