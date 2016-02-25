@@ -82,7 +82,7 @@ func removeAllVpnUsers(client *cloudstack.CloudStackClient, domainid string, acc
 	vpnUsers := getVpnUsers(client, domainid, accountName)
 	for _, vpnUser := range vpnUsers {
 		// TODO remove this!
-		if vpnUser.Username != "larstobi" {
+		if vpnUser.Username == "landro" {
 			params := vpnService.NewRemoveVpnUserParams(vpnUser.Username)
 			params.SetAccount(accountName)
 			params.SetDomainid(domainid)
