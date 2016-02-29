@@ -81,7 +81,11 @@ func getVpnHostnameForVpcName(vpcName string) (string) {
 		domain = "digipost.no"
 	}
 
-	return fmt.Sprintf("vpn.%s.%s", env, domain)
+	if env != "prod" {
+		return fmt.Sprintf("vpn.%s.%s", env, domain)
+	} else {
+		return fmt.Sprintf("vpn.%s", domain)
+	}
 
 }
 

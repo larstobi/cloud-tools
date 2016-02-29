@@ -11,5 +11,13 @@ func TestHostnameIsResolveCorrectly(t *testing.T) {
 		t.Error("Expected ", expected, ", got ", hostname)
 	}
 
+	hostname = getVpnHostnameForVpcName("sign_prod")
+
+	expected = "vpn.signering.posten.no"
+	if hostname != expected {
+		t.Error("Expected ", expected, ", got ", hostname)
+	}
+
+
 }
 
