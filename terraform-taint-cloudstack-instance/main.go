@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/digipost/cloud-tools/terraform"
 	"os"
+	"os/exec"
 )
 
 func main() {
@@ -27,11 +28,11 @@ func main() {
 		if resourceState, ok := state.Modules[0].Resources[cloudstackInstanceId]; ok {
 
 			vmName := resourceState.Primary.Attributes["name"]
-			fmt.Println("terraform taint " + cloudstackInstanceId)
+			taint(cloudstackInstanceId)
 
 			for resourceId, resource := range state.Modules[0].Resources {
 				if resource.Type == "cloudstack_nic" && resource.Primary.Attributes["virtual_machine"] == vmName {
-					fmt.Println("terraform taint " + resourceId)
+					taint(resourceId)
 				}
 			}
 
@@ -41,4 +42,12 @@ func main() {
 		}
 	}
 
+}
+
+func taint(resourceId string) {
+	cmd := exec.Command("terraform", "taint", resourceId)
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	defer cmd.Wait()
+	cmd.Start()
 }
