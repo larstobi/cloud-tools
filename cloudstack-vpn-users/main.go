@@ -81,16 +81,13 @@ func removeAllVpnUsers(client *cloudstack.CloudStackClient, domainid string, acc
 	vpnService := cloudstack.NewVPNService(client)
 	vpnUsers := getVpnUsers(client, domainid, accountName)
 	for _, vpnUser := range vpnUsers {
-		// TODO remove this!
-		if vpnUser.Username == "landro" {
-			params := vpnService.NewRemoveVpnUserParams(vpnUser.Username)
-			params.SetAccount(accountName)
-			params.SetDomainid(domainid)
-			if _, err := vpnService.RemoveVpnUser(params); err != nil {
-				fmt.Printf("Failed to remove remote access VPN for user %s: %s\n", vpnUser.Username, err.Error())
-			} else {
-				fmt.Printf("Removed remote access VPN for user %s (account: %s, domainid: %s)\n", vpnUser.Username, accountName, domainid)
-			}
+		params := vpnService.NewRemoveVpnUserParams(vpnUser.Username)
+		params.SetAccount(accountName)
+		params.SetDomainid(domainid)
+		if _, err := vpnService.RemoveVpnUser(params); err != nil {
+			fmt.Printf("Failed to remove remote access VPN for user %s: %s\n", vpnUser.Username, err.Error())
+		} else {
+			fmt.Printf("Removed remote access VPN for user %s (account: %s, domainid: %s)\n", vpnUser.Username, accountName, domainid)
 		}
 	}
 }
