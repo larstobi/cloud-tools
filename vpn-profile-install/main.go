@@ -54,7 +54,7 @@ func main() {
 		PayloadOrganization: vpcName,
 	}
 
-	cmd := exec.Command("profiles", "-I", "-F", "-")
+	cmd := exec.Command("/usr/bin/profiles", "-I", "-F", "-")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	writer, _ := cmd.StdinPipe()
